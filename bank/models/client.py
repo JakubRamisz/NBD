@@ -8,7 +8,6 @@ class Client(Base):
     id = Column(Integer, primary_key=True)
     first_name = Column(String)
     last_name = Column(String)
-    # accounts = relationship("Account")
 
     def __init__(self, first_name, last_name):
         self.first_name = first_name
