@@ -45,3 +45,10 @@ class SavingsAccount(Account):
 
         self.rate = rate
         self.last_update_date = self.date = datetime.now()
+
+    def update_account(self):
+        self.last_update_date = datetime.now()
+
+    def update_balance(self):
+        self.update_account()
+        self.balance = self.balance * (self.rate + 1)
