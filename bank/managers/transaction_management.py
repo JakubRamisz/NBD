@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from models.account import Account
-from models.base import Base, engine, Session
+from models.base import Session
 from models.transaction import Transaction, TransactionTypes
 
 

@@ -1,6 +1,6 @@
-from models.client import Client
 from sqlalchemy import select
-from models.base import Base, engine, Session
+from models.base import Session
+from models.client import Client
 from models.account import SavingsAccount, PersonalAccount, Account
 
 def add_savings_account(account_number, owner_id, rate):

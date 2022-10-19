@@ -1,4 +1,4 @@
-from models.base import Base, engine, Session
+from models.base import Session
 from models.client import Client
 
 

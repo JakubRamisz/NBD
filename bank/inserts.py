@@ -1,25 +1,15 @@
-from models.base import Base, engine, Session
-from models.client import Client
-from models.transaction import Transaction, TransactionTypes
-from models.account import SavingsAccount, PersonalAccount
-
+from models.base import Base, engine
+from managers.account_management import add_personal_account, add_savings_account
+from managers.transaction_management import deposit, transfer
+from managers.client_management import add_client
 
 Base.metadata.create_all(engine)
 
-session = Session()
+client_id = add_client('Jan', 'Kowalski')
+acc_id1 = add_personal_account('123', client_id)
+acc_id2 = add_savings_account('456', client_id, 0.1)
 
 
-client1 = Client('Jan', 'Kowalski')
-account = SavingsAccount('123', client1, 10, 0.1)
-a2= PersonalAccount('22',client1, 12 )
+deposit(acc_id1, 200)
 
-t1 = Transaction(100, TransactionTypes.withdrawal, account)
-t2 = Transaction(120, TransactionTypes.withdrawal, a2)
-
-
-session.add(t1)
-session.add(t2)
-
-session.commit()
-
-session.close()
+transfer(acc_id1, acc_id2, 50)
