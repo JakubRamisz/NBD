@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, Numeric, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
@@ -21,12 +20,15 @@ class Account(Base):
     }
 
 
-    def __init__(self, account_number, owner, balance):
+    def __init__(self, account_number, owner):
         self.account_number = account_number
         self.owner = owner
-        self.balance = balance
+        self.balance = 0
 
     def update_account(self):
+        pass
+
+    def update_balance(self):
         pass
 
 
@@ -44,13 +46,16 @@ class SavingsAccount(Account):
         'polymorphic_identity': 'savings_account',
     }
 
-    def __init__(self, account_number, owner, balance, rate):
-        super().__init__(account_number, owner, balance)
+    def __init__(self, account_number, owner, rate):
+        super().__init__(account_number, owner)
 
         self.rate = rate
         self.last_update_date = self.date = datetime.now()
 
     def update_account(self):
+        self.last_update_date = datetime.now()
+
+    def update_balance(self):
         if datetime.now() - self.last_update_date >= timedelta(days=30):
             self.balance = self.balance * (self.rate + 1)
-            self.last_update_date = datetime.now()
+            self.update_account()
