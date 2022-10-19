@@ -1,4 +1,5 @@
-from datetime import datetime
+from abc import abstractmethod
+from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, Numeric, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from models.base import Base
@@ -25,6 +26,9 @@ class Account(Base):
         self.owner = owner
         self.balance = balance
 
+    def update_account(self):
+        pass
+
 
 class PersonalAccount(Account):
     __mapper_args__ = {
@@ -47,8 +51,6 @@ class SavingsAccount(Account):
         self.last_update_date = self.date = datetime.now()
 
     def update_account(self):
-        self.last_update_date = datetime.now()
-
-    def update_balance(self):
-        self.update_account()
-        self.balance = self.balance * (self.rate + 1)
+        if datetime.now() - self.last_update_date >= timedelta(days=30):
+            self.balance = self.balance * (self.rate + 1)
+            self.last_update_date = datetime.now()
