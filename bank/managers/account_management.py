@@ -1,22 +1,26 @@
+from models.client import Client
 from sqlalchemy import select
 from models.base import Base, engine, Session
 from models.account import SavingsAccount, PersonalAccount, Account
 
-Base.metadata.create_all(engine)
-
-
-def add_savings_account(account_number, owner, rate):
-    account = SavingsAccount(account_number, owner, rate)
+def add_savings_account(account_number, owner_id, rate):
     with Session() as session:
+        owner = find_owner_by_id(session, owner_id)
+        account = SavingsAccount(account_number, owner, rate)
         session.add(account)
         session.commit()
+        account_id = account.id
+    return account_id
 
 
-def add_personal_account(account_number, owner):
-    account = PersonalAccount(account_number, owner)
+def add_personal_account(account_number, owner_id):
     with Session() as session:
+        owner = find_owner_by_id(session, owner_id)
+        account = PersonalAccount(account_number, owner)
         session.add(account)
         session.commit()
+        account_id = account.id
+    return account_id
 
 
 def update_account_balance(account):
@@ -31,3 +35,8 @@ def update_all_accounts():
         for account in session.scalars(stmt):
             update_account_balance(account)
         session.commit()
+
+
+def find_owner_by_id(session, owner_id):
+    stmt = select(Client).where(Client.id == owner_id)
+    return session.scalars(stmt).one()
