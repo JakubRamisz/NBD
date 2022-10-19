@@ -22,7 +22,6 @@ class Transaction(Base):
     account_id = Column(Integer, ForeignKey('accounts.id'))
     account = relationship('Account', backref='transaction')
 
-
     def __init__(self, amount, transaction_type, account, date=None):
         self.amount = amount
         self.transaction_type = transaction_type

@@ -3,6 +3,7 @@ from sqlalchemy import Column, Integer, Numeric, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from models.base import Base
 
+
 class Account(Base):
     __tablename__ = 'accounts'
 
@@ -18,7 +19,6 @@ class Account(Base):
         'polymorphic_on': 'type',
         'polymorphic_identity': 'account',
     }
-
 
     def __init__(self, account_number, owner):
         self.account_number = account_number
