@@ -4,6 +4,7 @@ from models.client import Client
 
 Base.metadata.create_all(engine)
 
+
 def add_client(first_name, last_name):
 	client = Client(first_name, last_name)
 	with Session() as session:

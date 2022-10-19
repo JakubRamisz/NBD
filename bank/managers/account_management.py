@@ -11,16 +11,19 @@ def add_savings_account(account_number, owner, rate):
         session.add(account)
         session.commit()
 
+
 def add_personal_account(account_number, owner):
     account = PersonalAccount(account_number, owner)
     with Session() as session:
         session.add(account)
         session.commit()
 
+
 def update_account_balance(account):
     with Session() as session:
         account.update_balance()
         session.commit()
+
 
 def update_all_accounts():
     with Session() as session:
