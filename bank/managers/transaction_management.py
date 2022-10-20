@@ -6,8 +6,8 @@ from models.transaction import Transaction, TransactionTypes
 
 def transfer(account_id_from, account_id_to, amount):
     with Session() as session:
-        account_from = find_account_by_id(session, account_id_from)
-        account_to = find_account_by_id(session, account_id_to)
+        account_from = session.query(Account).get(account_id_from)
+        account_to = session.query(Account).get(account_id_to)
         if account_from.balance - amount >= 0:
             account_from.balance -= amount
             account_to.balance += amount
@@ -21,7 +21,7 @@ def transfer(account_id_from, account_id_to, amount):
 
 def withdraw(account_id, amount):
     with Session() as session:
-        account = find_account_by_id(session, account_id)
+        account = session.query(Account).get(account_id)
         if account.balance - amount >= 0:
             account.balance -= amount
             account.update_account()
@@ -32,7 +32,7 @@ def withdraw(account_id, amount):
 
 def deposit(account_id, amount):
     with Session() as session:
-        account = find_account_by_id(session, account_id)
+        account = session.query(Account).get(account_id)
         account.balance += amount
         account.update_account()
         add_transaction(session, amount, TransactionTypes.deposit, account)
@@ -43,8 +43,3 @@ def add_transaction(session, amount, transaction_type, account, date=None):
     transaction = Transaction(amount, transaction_type, account, date)
     session.add(transaction)
     return transaction
-
-
-def find_account_by_id(session, acc_id):
-    stmt = select(Account).where(Account.id == acc_id)
-    return session.scalars(stmt).one()
