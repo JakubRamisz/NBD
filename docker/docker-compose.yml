@@ -2,15 +2,11 @@ version: '3.8'
 
 services:
   db:
-    image: postgres
+    image: mongo
     restart: always
     environment:
-      POSTGRES_DB: nbddb
-      POSTGRES_USER: nbd
-      POSTGRES_PASSWORD: nbdpassword
+      - MONGO_INITDB_DATABASE=nbddb
+      - MONGO_INITDB_ROOT_USERNAME=nbd
+      - MONGO_INITDB_ROOT_PASSWORD=nbdpassword
     ports:
-      - 5432:5432
-    volumes:
-      - pg:/var/lib/postgresql/data
-volumes:
-  pg:
+      - '27017:27017'
