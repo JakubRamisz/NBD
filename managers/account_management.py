@@ -1,5 +1,4 @@
 from db import get_collection
-from models.client import Client
 from models.account import SavingsAccount, PersonalAccount, Account
 
 
@@ -9,8 +8,9 @@ def add_savings_account(account_number, owner, rate):
         print('Given account number already exists.')
         return
 
-    account = SavingsAccount(account_number, owner, 0, rate)
+    account = SavingsAccount(account_number, 0, owner, rate=rate)
     collection.insert_one(account.get_dictionary())
+    return account
 
 
 def add_personal_account(account_number, owner):
@@ -19,24 +19,44 @@ def add_personal_account(account_number, owner):
         print('Given account number already exists.')
         return
 
-    account = PersonalAccount(account_number, owner, 0)
+    account = PersonalAccount(account_number, 0, owner)
     collection.insert_one(account.get_dictionary())
+    return account
 
 
-def get_account(account_number):
+def get_account(id):
     collection = get_collection('accounts')
-    result = collection.find_one({'account_number': account_number})
-    return Account(**result)
+    result = collection.find_one({'_id': id})
+    if result is not None:
+        return Account(**result)
 
 
-# def update_account_balance(account):
-#     with Session() as session:
-#         account.update_balance()
-#         session.commit()
+def get_all_accounts():
+    result = []
+    collection = get_collection('accounts')
+    for account in collection.find({}):
+        result.append(Account(**account))
+    return result
 
 
-# def update_all_accounts():
-#     with Session() as session:
-#         for account in session.query(Account).all:
-#             update_account_balance(account)
-#         session.commit()
+def delete_account(id):
+    collection = get_collection('accounts')
+    result = collection.find_one({'_id': id})
+    if result is not None:
+        collection.delete_one({'_id': id})
+
+
+def update_account(account, values):
+    collection = get_collection('accounts')
+    collection.update_one({'_id': str(account._id)}, {'$set': values})
+
+
+def update_account_balance(account):
+    account.update_balance()
+    update_account(account, {'balance': account.balance,
+                             'last_update_date': account.last_update_date})
+
+
+def update_all_accounts():
+    for account in get_all_accounts():
+        update_account_balance(account)
