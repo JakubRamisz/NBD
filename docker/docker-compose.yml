@@ -2,11 +2,15 @@ version: '3.8'
 
 services:
   db:
-    image: mongo
+    image: mongo:5
     restart: always
+    container_name: mongodb
     environment:
       - MONGO_INITDB_DATABASE=nbddb
-      - MONGO_INITDB_ROOT_USERNAME=nbd
-      - MONGO_INITDB_ROOT_PASSWORD=nbdpassword
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=adminp
     ports:
       - '27017:27017'
+    
+    volumes:
+      - ./data:/data/db
