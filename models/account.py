@@ -1,29 +1,19 @@
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, Numeric, String, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
-from models.base import Base
+from dataclasses import dataclass
+from models.client import Client
 
+@dataclass
+class Account:
+    _id: str
+    account_number: str
+    balance: float
+    owner: Client
 
-class Account(Base):
-    __tablename__ = 'accounts'
-
-    id = Column(Integer, primary_key=True)
-    account_number = Column(String)
-    balance = Column(Numeric)
-    owner_id = Column(Integer, ForeignKey('clients.id'))
-    owner = relationship('Client', backref='account')
-
-    type = Column(String)
-
-    __mapper_args__ = {
-        'polymorphic_on': 'type',
-        'polymorphic_identity': 'account',
-    }
-
-    def __init__(self, account_number, owner):
+    def __init__(self, _id, account_number, owner, balance):
+        self._id = _id
         self.account_number = account_number
         self.owner = owner
-        self.balance = 0
+        self.balance = balance
 
     def update_account(self):
         pass
@@ -31,23 +21,28 @@ class Account(Base):
     def update_balance(self):
         pass
 
+    def get_dictionary(self):
+        dict = {
+            'account_number': self.account_number,
+            'balance': self.balance,
+            'owner': self.owner.get_dictionary()
+        }
+        return dict
 
+
+@dataclass
 class PersonalAccount(Account):
-    __mapper_args__ = {
-        'polymorphic_identity': 'personal_account',
-    }
+    def __init__(self, _id, account_number, owner, balance):
+        super().__init__(_id, account_number, owner, balance)
 
 
+@dataclass
 class SavingsAccount(Account):
-    rate = Column(Numeric)
-    last_update_date = Column(DateTime, nullable=True)
+    rate: float
+    last_update_date: datetime
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'savings_account',
-    }
-
-    def __init__(self, account_number, owner, rate):
-        super().__init__(account_number, owner)
+    def __init__(self, _id, account_number, owner, balance, rate):
+        super().__init__(_id, account_number, owner, balance)
 
         self.rate = rate
         self.last_update_date = self.date = datetime.now()
@@ -59,3 +54,13 @@ class SavingsAccount(Account):
         if datetime.now() - self.last_update_date >= timedelta(days=30):
             self.balance = self.balance * (self.rate + 1)
             self.update_account()
+
+    def get_dictionary(self):
+        dict = {
+            'account_number': self.account_number,
+            'balance': self.balance,
+            'owner': self.owner.get_dictionary(),
+            'rate': self.rate,
+            'last_update_date': self.last_update_date
+        }
+        return dict

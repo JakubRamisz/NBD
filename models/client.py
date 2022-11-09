@@ -1,14 +1,14 @@
-from sqlalchemy import Column, Integer, String
-from models.base import Base
+from dataclasses import dataclass
 
 
-class Client(Base):
-    __tablename__ = 'clients'
+@dataclass
+class Client:
+    first_name: str
+    last_name: str
 
-    id = Column(Integer, primary_key=True)
-    first_name = Column(String)
-    last_name = Column(String)
-
-    def __init__(self, first_name, last_name):
-        self.first_name = first_name
-        self.last_name = last_name
+    def get_dictionary(self):
+        dict = {
+            'first_name': self.first_name,
+            'last_name': self.last_name
+        }
+        return dict

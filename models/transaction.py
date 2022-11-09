@@ -2,7 +2,6 @@ import enum
 from datetime import datetime
 from sqlalchemy import Column, Integer, Enum, DateTime, Numeric, ForeignKey
 from sqlalchemy.orm import relationship
-from models.base import Base
 
 
 class TransactionTypes(enum.Enum):
@@ -12,13 +11,12 @@ class TransactionTypes(enum.Enum):
     transfer_from = 4
 
 
-class Transaction(Base):
+class Transaction:
     __tablename__ = 'transactions'
 
-    id = Column(Integer, primary_key=True)
-    date = Column(DateTime)
-    amount = Column(Numeric)
-    transaction_type = Column(Enum(TransactionTypes))
+    date: datetime
+    amount: int
+    transaction_type: enum.Enum(TransactionTypes)
     account_id = Column(Integer, ForeignKey('accounts.id'))
     account = relationship('Account', backref='transaction')
 
