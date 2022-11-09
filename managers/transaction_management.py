@@ -1,43 +1,64 @@
-from models.account import Account
 from models.transaction import Transaction, TransactionTypes
+from managers.account_management import update_account_balance
+from db import get_collection
 
 
-def transfer(account_id_from, account_id_to, amount):
-    with Session() as session:
-        account_from = session.query(Account).get(account_id_from)
-        account_to = session.query(Account).get(account_id_to)
-        if account_from.balance - amount >= 0:
-            account_from.balance -= amount
-            account_to.balance += amount
-            account_from.update_account()
-            account_to.update_account()
-        session.commit()
-
-    add_transaction(session, amount, TransactionTypes.transfer_from, account_from)
-    add_transaction(session, amount, TransactionTypes.transfer_to, account_to)
+def transfer(account_from, account_to, amount):
+    if account_from.balance - amount >= 0:
+        account_from.balance -= amount
+        account_to.balance += amount
+        account_from.update_account()
+        account_to.update_account()
+        update_account_balance(account_from)
+        update_account_balance(account_to)
+        add_transaction(amount, TransactionTypes.transfer_from, account_from)
+        add_transaction(amount, TransactionTypes.transfer_to, account_to)
 
 
-def withdraw(account_id, amount):
-    with Session() as session:
-        account = session.query(Account).get(account_id)
-        if account.balance - amount >= 0:
-            account.balance -= amount
-            account.update_account()
-        session.commit()
-
-    add_transaction(session, amount, TransactionTypes.withdrawal, account)
-
-
-def deposit(account_id, amount):
-    with Session() as session:
-        account = session.query(Account).get(account_id)
-        account.balance += amount
+def withdraw(account, amount):
+    if account.balance - amount >= 0:
+        account.balance -= amount
         account.update_account()
-        add_transaction(session, amount, TransactionTypes.deposit, account)
-        session.commit()
+        update_account_balance(account)
+        add_transaction(amount, TransactionTypes.withdrawal, account)
 
 
-def add_transaction(session, amount, transaction_type, account, date=None):
-    transaction = Transaction(amount, transaction_type, account, date)
-    session.add(transaction)
+def deposit(account, amount):
+    account.balance += amount
+    account.update_account()
+    update_account_balance(account)
+    add_transaction(amount, TransactionTypes.deposit, account)
+
+
+def add_transaction(amount, transaction_type, account):
+    collection = get_collection('transactions')
+    transaction = Transaction(amount, transaction_type, account)
+    collection.insert_one(transaction.get_dictionary())
     return transaction
+
+
+def get_transaction(id):
+    collection = get_collection('transactions')
+    result = collection.find_one({'_id': str(id)})
+    if result is not None:
+        return Transaction(**result)
+
+
+def get_all_transactions():
+    result = []
+    collection = get_collection('transactions')
+    for transaction in collection.find({}):
+        result.append(Transaction(**transaction))
+    return result
+
+
+def delete_transaction(id):
+    collection = get_collection('transactions')
+    result = collection.find_one({'_id': str(id)})
+    if result is not None:
+        collection.delete_one({'_id': str(id)})
+
+
+def update_transaction(transaction, values):
+    collection = get_collection('transactions')
+    collection.update_one({'_id': str(transaction._id)}, {'$set': values})

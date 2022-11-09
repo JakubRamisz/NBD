@@ -1,5 +1,5 @@
 from db import get_collection
-from models.account import SavingsAccount, PersonalAccount, Account
+from models.account import SavingsAccount, PersonalAccount
 
 
 def add_savings_account(account_number, owner, rate):
@@ -26,24 +26,30 @@ def add_personal_account(account_number, owner):
 
 def get_account(id):
     collection = get_collection('accounts')
-    result = collection.find_one({'_id': id})
+    result = collection.find_one({'_id': str(id)})
     if result is not None:
-        return Account(**result)
+        if result['type'] == 'savings_account':
+            return SavingsAccount(**result)
+        else:
+            return PersonalAccount(**result)
 
 
 def get_all_accounts():
     result = []
     collection = get_collection('accounts')
     for account in collection.find({}):
-        result.append(Account(**account))
+        if account['type'] == 'savings_account':
+            result.append(SavingsAccount(**account))
+        else:
+            result.append(PersonalAccount(**account))
     return result
 
 
 def delete_account(id):
     collection = get_collection('accounts')
-    result = collection.find_one({'_id': id})
+    result = collection.find_one({'_id': str(id)})
     if result is not None:
-        collection.delete_one({'_id': id})
+        collection.delete_one({'_id': str(id)})
 
 
 def update_account(account, values):
@@ -53,8 +59,9 @@ def update_account(account, values):
 
 def update_account_balance(account):
     account.update_balance()
-    update_account(account, {'balance': account.balance,
-                             'last_update_date': account.last_update_date})
+    if account.type == 'savings_account':
+        update_account(account, {'balance': account.balance,
+                                'last_update_date': account.last_update_date})
 
 
 def update_all_accounts():

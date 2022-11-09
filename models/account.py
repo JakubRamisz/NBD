@@ -1,6 +1,7 @@
 from uuid import uuid4, UUID
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
+from typing import ClassVar
 from models.client import Client
 
 @dataclass
@@ -8,6 +9,7 @@ class Account:
     account_number: str
     balance: float
     owner: Client
+    type: ClassVar
     _id: uuid4 = field(default_factory=uuid4)
 
     def __post_init__(self):
@@ -29,18 +31,20 @@ class Account:
             '_id': str(self._id),
             'account_number': self.account_number,
             'balance': self.balance,
-            'owner': self.owner.get_dictionary()
+            'owner': self.owner.get_dictionary(),
+            'type': self.type
         }
         return dict
 
 
 @dataclass
 class PersonalAccount(Account):
-    pass
+    type: str = 'personal_account'
 
 
 @dataclass
 class SavingsAccount(Account):
+    type: str = 'savings_account'
     rate: float = 0.1
     last_update_date: datetime = datetime.now()
 
@@ -58,6 +62,7 @@ class SavingsAccount(Account):
             'account_number': self.account_number,
             'balance': self.balance,
             'owner': self.owner.get_dictionary(),
+            'type': self.type,
             'rate': self.rate,
             'last_update_date': self.last_update_date
         }
