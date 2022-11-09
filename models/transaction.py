@@ -37,7 +37,7 @@ class Transaction:
     def get_dictionary(self):
         dict = {
             'amount': self.amount,
-            'transaction_type': str(self.transaction_type),
+            'transaction_type': str(self.transaction_type.name),
             'account': self.account.get_dictionary(),
             'date': str(self.date),
             '_id': str(self._id)
