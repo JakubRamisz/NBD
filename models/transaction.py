@@ -1,7 +1,8 @@
 import enum
+from dataclasses import dataclass, field
 from datetime import datetime
-from sqlalchemy import Column, Integer, Enum, DateTime, Numeric, ForeignKey
-from sqlalchemy.orm import relationship
+from uuid import uuid4, UUID
+from models.account import Account
 
 
 class TransactionTypes(enum.Enum):
@@ -11,20 +12,31 @@ class TransactionTypes(enum.Enum):
     transfer_from = 4
 
 
+@dataclass
 class Transaction:
-    __tablename__ = 'transactions'
-
-    date: datetime
     amount: int
-    transaction_type: enum.Enum(TransactionTypes)
-    account_id = Column(Integer, ForeignKey('accounts.id'))
-    account = relationship('Account', backref='transaction')
+    transaction_type: TransactionTypes
+    account: Account
+    date: datetime = datetime.now()
+    _id: uuid4 = field(default_factory=uuid4)
 
-    def __init__(self, amount, transaction_type, account, date=None):
-        self.amount = amount
-        self.transaction_type = transaction_type
-        self.account = account
-        if date is None:
-            self.date = datetime.now()
-        else:
-            self.date = date
+    def __post_init__(self):
+        if isinstance(self.account, dict):
+            self.account = Account(**self.account)
+
+        if isinstance(self.date, dict):
+            self._id = datetime(self._id)
+
+        if isinstance(self._id, dict):
+            self._id = UUID(self._id)
+
+
+    def get_dictionary(self):
+        dict = {
+            'amount': self.amount,
+            'transaction_type': str(self.transaction_type),
+            'account': self.account.get_dictionary(),
+            'date': str(self.date),
+            '_id': str(self._id)
+        }
+        return dict
