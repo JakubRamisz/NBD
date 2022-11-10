@@ -34,15 +34,14 @@ def add_transaction(amount, transaction_type, account):
     collection = get_collection('transactions')
     transaction = Transaction(amount, transaction_type, account)
     collection.insert_one(transaction.get_dictionary())
-    return transaction
+    return transaction._id
 
 
 def get_transaction(id):
     collection = get_collection('transactions')
     result = collection.find_one({'_id': str(id)})
     if result is not None:
-        return Transaction(**result)
-
+        return Transaction(**result)   
 
 def get_all_transactions():
     result = []

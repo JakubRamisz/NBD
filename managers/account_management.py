@@ -32,7 +32,15 @@ def get_account(id):
             return SavingsAccount(**result)
         else:
             return PersonalAccount(**result)
-
+ 
+def get_account_by_account_number(account_number):
+    collection = get_collection('accounts')
+    result = collection.find_one({'account_number': str(account_number)})
+    if result is not None:
+        if result['type'] == 'savings_account':
+            return SavingsAccount(**result)
+        else:
+            return PersonalAccount(**result)
 
 def get_all_accounts():
     result = []
@@ -51,10 +59,17 @@ def delete_account(id):
     if result is not None:
         collection.delete_one({'_id': str(id)})
 
+def delete_account_by_account_number(account_number):
+    collection = get_collection('accounts')
+    result = collection.find_one({'account_number': str(account_number)})
+    if result is not None:
+        collection.delete_one({'account_number': str(account_number)})
+
 
 def update_account(account, values):
     collection = get_collection('accounts')
     collection.update_one({'_id': str(account._id)}, {'$set': values})
+
 
 
 def update_account_balance(account):
