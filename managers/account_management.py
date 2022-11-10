@@ -77,6 +77,8 @@ def update_account_balance(account):
     if account.type == 'savings_account':
         update_account(account, {'balance': account.balance,
                                 'last_update_date': account.last_update_date})
+    else:
+        update_account(account, {'balance': account.balance})
 
 
 def update_all_accounts():
