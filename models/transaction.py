@@ -2,6 +2,7 @@ import enum
 from dataclasses import dataclass, field
 from datetime import datetime
 from uuid import uuid4, UUID
+from redis_om import HashModel
 from models.account import PersonalAccount, SavingsAccount, Account
 
 
@@ -13,7 +14,7 @@ class TransactionTypes(enum.Enum):
 
 
 @dataclass
-class Transaction:
+class Transaction(HashModel):
     amount: int
     transaction_type: TransactionTypes
     account: Account
