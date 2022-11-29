@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from redis_om import HashModel
 
 
-@dataclass
+
 class Client(HashModel):
     first_name: str
     last_name: str
