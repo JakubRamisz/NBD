@@ -8,8 +8,7 @@ client = MongoClient(MONGO_CONNECTION_STRING)
 db = client[MONGO_DB]
 
 hash_prefix = {
-    'personal_account': 'PersonalAccount:',
-    'savings_account': 'SavingsAccount:',
+    'account': 'Account:',
     'transaction': 'Transaction:'
 }
 

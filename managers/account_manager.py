@@ -1,5 +1,6 @@
 from db.db import get_collection
 from models.account import SavingsAccount, PersonalAccount
+from decorators.account_manager_decorator import AccountManagerDecorator
 
 
 class AccountManager:
@@ -26,6 +27,7 @@ class AccountManager:
         return account
 
     @staticmethod
+    @AccountManagerDecorator.get_account
     def get_account(id):
         collection = get_collection('accounts')
         result = collection.find_one({'_id': str(id)})
@@ -36,16 +38,7 @@ class AccountManager:
                 return PersonalAccount(**result)
 
     @staticmethod
-    def get_account_by_account_number(account_number):
-        collection = get_collection('accounts')
-        result = collection.find_one({'account_number': str(account_number)})
-        if result is not None:
-            if result['type'] == 'savings_account':
-                return SavingsAccount(**result)
-            else:
-                return PersonalAccount(**result)
-
-    @staticmethod
+    @AccountManagerDecorator.get_all_accounts
     def get_all_accounts():
         result = []
         collection = get_collection('accounts')
@@ -63,12 +56,6 @@ class AccountManager:
         if result is not None:
             collection.delete_one({'_id': str(id)})
 
-    @staticmethod
-    def delete_account_by_account_number(account_number):
-        collection = get_collection('accounts')
-        result = collection.find_one({'account_number': str(account_number)})
-        if result is not None:
-            collection.delete_one({'account_number': str(account_number)})
 
     @staticmethod
     def update_account(account, values):

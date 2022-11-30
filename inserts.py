@@ -1,6 +1,7 @@
 from models.client import Client
 from models.account import PersonalAccount, SavingsAccount
 from models.transaction import Transaction, TransactionTypes
+from managers.account_manager import AccountManager
 from db.db import redis_db, hash_prefix
 import json
 
@@ -18,14 +19,13 @@ def main():
     acc2 = SavingsAccount('456', 0, client)
     # deposit(acc1, 100)
     # transfer(acc1, acc2, 50)
-    # for acc in get_all_accounts():
-    #     print(acc)
+    print(AccountManager.get_account("261947f5-40be-4d8e-a38b-b2318e68cfe5"))
 
     # for trs in get_all_transactions():
     #     print(trs)
-    redis_db.set(hash_prefix['personal_account'] + str(acc1._id), json.dumps(acc1.dict()))
+    # redis_db.set(hash_prefix['account'] + str(acc1._id), json.dumps(acc1.dict()))
 
-    redis_db.set(hash_prefix['savings_account'] + str(acc2._id), json.dumps(acc2.dict()))
+    # redis_db.set(hash_prefix['account'] + str(acc2._id), json.dumps(acc2.dict()))
 
 if __name__ == '__main__':
     main()
