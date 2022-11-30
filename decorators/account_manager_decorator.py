@@ -1,5 +1,6 @@
 import json
 from db.db import redis_db, hash_prefix
+from redis import ConnectionError
 from models.account import SavingsAccount, PersonalAccount
 
 
@@ -22,15 +23,34 @@ class AccountManagerDecorator():
     @staticmethod
     def get_account(func):
         def wrapper(*args, **kwargs):
-            account = redis_db.get(f'{AccountManagerDecorator.prefix}{args[0]}')
-            if account is None:
+            try:
+                redis_db.ping()
+                account = json.loads(redis_db.get(f'{AccountManagerDecorator.prefix}{args[0]}'))
+                if account['type'] == 'savings_account':
+                    return SavingsAccount(**account)
+                return PersonalAccount(**account)
+            except ConnectionError:
                 return func(*args, **kwargs)
-
-            account = json.loads(account)
-            if account['type'] == 'savings_account':
-                return SavingsAccount(**account)
-            return PersonalAccount(**account)
         return wrapper
+
+
+    @staticmethod
+    def get_all_accounts(func):
+        def wrapper(*args, **kwargs):
+            try:
+                redis_db.ping()
+                accounts = []
+                cached = get_cached()
+                for account in cached:
+                    if account['type'] == 'savings_account':
+                        accounts.append(SavingsAccount(**account))
+                    else:
+                        accounts.append(PersonalAccount(**account))
+                return accounts
+            except ConnectionError:
+                return func(*args, **kwargs)
+        return wrapper
+
 
     @staticmethod
     def delete_account(func):
