@@ -7,8 +7,18 @@ from models.client import Client
 @dataclass
 class Account:
     account_number: str
-    client_id: str
-    balance: float = 0
+    balance: float
+    owner: Client
+    type: ClassVar
+    _id: uuid4 = field(default_factory=uuid4)
+
+    def __post_init__(self):
+        if isinstance(self.owner, dict):
+            self.owner = Client(**self.owner)
+
+        if isinstance(self._id, dict):
+            self._id = UUID(self._id)
+
 
     def update_account(self):
         pass
@@ -16,19 +26,23 @@ class Account:
     def update_balance(self):
         pass
 
-    def get_dictionary(self):
-        dict = {
+    def __dict__(self):
+        result = {
+            '_id': str(self._id),
             'account_number': self.account_number,
             'balance': self.balance,
-            'client': self.client_id
+            'owner': self.owner.__dict__(),
+            'type': self.type
         }
-        return dict
+        return result
 
 
+@dataclass
 class PersonalAccount(Account):
     type: str = 'personal_account'
 
 
+@dataclass
 class SavingsAccount(Account):
     type: str = 'savings_account'
     rate: float = 0.1
@@ -42,13 +56,14 @@ class SavingsAccount(Account):
             self.balance = self.balance * (self.rate + 1)
             self.update_account()
 
-    def get_dictionary(self):
-        dict = {
+    def __dict__(self):
+        result = {
+            '_id': str(self._id),
             'account_number': self.account_number,
             'balance': self.balance,
-            'client': self.client_id,
+            'owner': self.owner.__dict__(),
             'type': self.type,
             'rate': self.rate,
-            'last_update_date': self.last_update_date
+            'last_update_date': str(self.last_update_date)
         }
-        return dict
+        return result

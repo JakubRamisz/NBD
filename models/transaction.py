@@ -16,15 +16,30 @@ class TransactionTypes(enum.Enum):
 class Transaction:
     amount: int
     transaction_type: TransactionTypes
-    account_id: str
+    account: Account
     date: datetime = datetime.now()
+    _id: uuid4 = field(default_factory=uuid4)
 
-    def get_dictionary(self):
-        dict = {
+    def __post_init__(self):
+        if isinstance(self.account, dict):
+            if self.account['type'] == 'savings_account':
+                self.account = SavingsAccount(**self.account )
+            else:
+                self.account = PersonalAccount(**self.account )
+
+        if isinstance(self.date, dict):
+            self._id = datetime(self._id)
+
+        if isinstance(self._id, dict):
+            self._id = UUID(self._id)
+
+
+    def __dict__(self):
+        result = {
             'amount': self.amount,
             'transaction_type': str(self.transaction_type.name),
-            'account': self.account_id,
+            'account': self.account.__dict__(),
             'date': str(self.date),
-
+            '_id': str(self._id)
         }
-        return dict
+        return result
