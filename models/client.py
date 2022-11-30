@@ -1,9 +1,8 @@
 from dataclasses import dataclass
-from redis_om import HashModel
 
 
-
-class Client(HashModel):
+@dataclass
+class Client:
     first_name: str
     last_name: str
 

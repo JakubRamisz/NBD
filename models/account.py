@@ -2,10 +2,10 @@ from uuid import uuid4, UUID
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from typing import ClassVar
-from redis_om import HashModel
+from models.client import Client
 
-
-class Account(HashModel):
+@dataclass
+class Account:
     account_number: str
     client_id: str
     balance: float = 0

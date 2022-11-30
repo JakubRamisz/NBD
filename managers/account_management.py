@@ -1,4 +1,4 @@
-from db.db import get_collection
+from db import get_collection
 from models.account import SavingsAccount, PersonalAccount
 
 

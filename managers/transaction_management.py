@@ -1,6 +1,6 @@
 from models.transaction import Transaction, TransactionTypes
 from managers.account_management import update_account_balance
-from db.db import get_collection
+from db import get_collection
 
 
 def transfer(account_from, account_to, amount):
