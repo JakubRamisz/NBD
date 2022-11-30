@@ -5,24 +5,28 @@ from decorators.account_manager_decorator import AccountManagerDecorator
 
 class AccountManager:
     @staticmethod
-    def add_savings_account(account_number, owner, rate):
+    @AccountManagerDecorator.add_account
+    def add_savings_account(account_number, balance, owner, rate):
         collection = get_collection('accounts')
-        if collection.find_one({'account_number': account_number}) is not None:
+        account = collection.find_one({'account_number': account_number})
+        if account is not None:
             print('Given account number already exists.')
-            return
+            return create_from_json(account)
 
-        account = SavingsAccount(account_number, 0, owner, rate=rate)
+        account = SavingsAccount(account_number, balance, owner, rate=rate)
         collection.insert_one(account.dict())
         return account
 
     @staticmethod
-    def add_personal_account(account_number, owner):
+    @AccountManagerDecorator.add_account
+    def add_personal_account(account_number, balance, owner):
         collection = get_collection('accounts')
-        if collection.find_one({'account_number': account_number}) is not None:
+        account = collection.find_one({'account_number': account_number})
+        if account is not None:
             print('Given account number already exists.')
-            return
+            return create_from_json(account)
 
-        account = PersonalAccount(account_number, 0, owner)
+        account = PersonalAccount(account_number, balance, owner)
         collection.insert_one(account.dict())
         return account
 
@@ -32,10 +36,7 @@ class AccountManager:
         collection = get_collection('accounts')
         result = collection.find_one({'_id': str(id)})
         if result is not None:
-            if result['type'] == 'savings_account':
-                return SavingsAccount(**result)
-            else:
-                return PersonalAccount(**result)
+            return create_from_json(result)
 
     @staticmethod
     @AccountManagerDecorator.get_all_accounts
@@ -43,10 +44,7 @@ class AccountManager:
         result = []
         collection = get_collection('accounts')
         for account in collection.find({}):
-            if account['type'] == 'savings_account':
-                result.append(SavingsAccount(**account))
-            else:
-                result.append(PersonalAccount(**account))
+            result.append(create_from_json(account))
         return result
 
     @staticmethod
@@ -75,3 +73,14 @@ class AccountManager:
     def update_all_accounts():
         for account in AccountManager.get_all_accounts():
             AccountManager.update_account_balance(account)
+
+    @staticmethod
+    @AccountManagerDecorator.invalidate_cache
+    def invalidate_cache():
+        pass
+
+
+def create_from_json(account):
+    if account['type'] == 'savings_account':
+        return SavingsAccount(**account)
+    return PersonalAccount(**account)
