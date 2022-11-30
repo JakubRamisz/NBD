@@ -2,6 +2,7 @@ import json
 from db.db import redis_db, hash_prefix
 from models.account import SavingsAccount, PersonalAccount
 
+
 class AccountManagerDecorator():
     prefix = hash_prefix['account']
 
@@ -9,7 +10,7 @@ class AccountManagerDecorator():
     def add_account(func):
         def wrapper(*args, **kwargs):
             account = func(*args, **kwargs)
-            cached = AccountManagerDecorator.get_cached()
+            cached = get_cached()
             for cached_account in cached:
                 if cached_account ['account_number'] == account.account_number:
                     return account
@@ -39,7 +40,7 @@ class AccountManagerDecorator():
                 return func(*args, **kwargs)
 
             accounts = []
-            cached = AccountManagerDecorator.get_cached()
+            cached = get_cached()
             for account in cached:
                 if account['type'] == 'savings_account':
                     accounts.append(SavingsAccount(**account))
@@ -55,32 +56,23 @@ class AccountManagerDecorator():
             func(*args, **kwargs)
         return wrapper
 
-    # @staticmethod
-    # def update_account(account, values):
-    #     collection = get_collection('accounts')
-    #     collection.update_one({'_id': str(account._id)}, {'$set': values})
-
-    # @staticmethod
-    # def update_account_balance(account):
-    #     account.update_balance()
-    #     if account.type == 'savings_account':
-    #         AccountManager.update_account(account, {'balance': account.balance,
-    #                                 'last_update_date': account.last_update_date})
-    #     else:
-    #         AccountManager.update_account(account, {'balance': account.balance})
-
-    # @staticmethod
-    # def update_all_accounts():
-    #     for account in AccountManager.get_all_accounts():
-    #         AccountManager.update_account_balance(account)
+    @staticmethod
+    def update_account(func):
+        def wrapper(*args, **kwargs):
+            account_dict = args[0].dict()
+            account_dict.update(args[1])
+            redis_db.set(hash_prefix['account'] + str(account_dict['_id']),
+                         json.dumps(account_dict))
+            return func(*args, **kwargs)
+        return wrapper
 
     @staticmethod
     def invalidate_cache(func):
         redis_db.flushdb()
         return func
 
-    @staticmethod
-    def get_cached():
-        keys = redis_db.keys(f'{AccountManagerDecorator.prefix}*')
-        accounts = [json.loads(redis_db.get(key)) for key in keys]
-        return accounts
+
+def get_cached():
+    keys = redis_db.keys(f'{AccountManagerDecorator.prefix}*')
+    accounts = [json.loads(redis_db.get(key)) for key in keys]
+    return accounts

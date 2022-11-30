@@ -55,9 +55,11 @@ class AccountManager:
 
 
     @staticmethod
+    @AccountManagerDecorator.update_account
     def update_account(account, values):
         collection = get_collection('accounts')
         collection.update_one({'_id': str(account._id)}, {'$set': values})
+        return AccountManager.get_account(account._id)
 
     @staticmethod
     def update_account_balance(account):
