@@ -39,7 +39,6 @@ class AccountManager:
             return create_from_json(result)
 
     @staticmethod
-    @AccountManagerDecorator.get_all_accounts
     def get_all_accounts():
         result = []
         collection = get_collection('accounts')
@@ -78,7 +77,7 @@ class AccountManager:
     @staticmethod
     @AccountManagerDecorator.invalidate_cache
     def invalidate_cache():
-        pass
+        return
 
 
 def create_from_json(account):

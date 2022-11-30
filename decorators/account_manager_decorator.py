@@ -33,23 +33,6 @@ class AccountManagerDecorator():
         return wrapper
 
     @staticmethod
-    def get_all_accounts(func):
-        def wrapper(*args, **kwargs):
-            keys = redis_db.keys(f'{AccountManagerDecorator.prefix}*')
-            if keys is None:
-                return func(*args, **kwargs)
-
-            accounts = []
-            cached = get_cached()
-            for account in cached:
-                if account['type'] == 'savings_account':
-                    accounts.append(SavingsAccount(**account))
-                else:
-                    accounts.append(PersonalAccount(**account))
-            return accounts
-        return wrapper
-
-    @staticmethod
     def delete_account(func):
         def wrapper(*args, **kwargs):
             redis_db.delete(f'{AccountManagerDecorator.prefix}{args[0]}')
@@ -68,8 +51,10 @@ class AccountManagerDecorator():
 
     @staticmethod
     def invalidate_cache(func):
-        redis_db.flushdb()
-        return func
+        def wrapper():
+            redis_db.flushdb()
+            return func
+        return wrapper
 
 
 def get_cached():
