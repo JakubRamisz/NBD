@@ -11,7 +11,7 @@ class AccountManager:
             return
 
         account = SavingsAccount(account_number, 0, owner, rate=rate)
-        collection.insert_one(account.get_dictionary())
+        collection.insert_one(account.dict())
         return account
 
     @staticmethod
@@ -22,7 +22,7 @@ class AccountManager:
             return
 
         account = PersonalAccount(account_number, 0, owner)
-        collection.insert_one(account.get_dictionary())
+        collection.insert_one(account.dict())
         return account
 
     @staticmethod

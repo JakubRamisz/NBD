@@ -26,12 +26,12 @@ class Account:
     def update_balance(self):
         pass
 
-    def __dict__(self):
+    def dict(self):
         result = {
             '_id': str(self._id),
             'account_number': self.account_number,
             'balance': self.balance,
-            'owner': self.owner.__dict__(),
+            'owner': self.owner.dict(),
             'type': self.type
         }
         return result
@@ -56,12 +56,12 @@ class SavingsAccount(Account):
             self.balance = self.balance * (self.rate + 1)
             self.update_account()
 
-    def __dict__(self):
+    def dict(self):
         result = {
             '_id': str(self._id),
             'account_number': self.account_number,
             'balance': self.balance,
-            'owner': self.owner.__dict__(),
+            'owner': self.owner.dict(),
             'type': self.type,
             'rate': self.rate,
             'last_update_date': str(self.last_update_date)

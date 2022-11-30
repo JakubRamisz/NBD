@@ -34,7 +34,7 @@ class TransactionManager:
     def add_transaction(amount, transaction_type, account):
         collection = get_collection('transactions')
         transaction = Transaction(amount, transaction_type, account)
-        collection.insert_one(transaction.get_dictionary())
+        collection.insert_one(transaction.dict())
         return transaction._id
 
     @staticmethod

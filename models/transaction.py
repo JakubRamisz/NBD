@@ -23,9 +23,9 @@ class Transaction:
     def __post_init__(self):
         if isinstance(self.account, dict):
             if self.account['type'] == 'savings_account':
-                self.account = SavingsAccount(**self.account )
+                self.account = SavingsAccount(**self.account)
             else:
-                self.account = PersonalAccount(**self.account )
+                self.account = PersonalAccount(**self.account)
 
         if isinstance(self.date, dict):
             self._id = datetime(self._id)
@@ -34,11 +34,11 @@ class Transaction:
             self._id = UUID(self._id)
 
 
-    def __dict__(self):
+    def dict(self):
         result = {
             'amount': self.amount,
             'transaction_type': str(self.transaction_type.name),
-            'account': self.account.__dict__(),
+            'account': self.account.dict(),
             'date': str(self.date),
             '_id': str(self._id)
         }

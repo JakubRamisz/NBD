@@ -23,9 +23,9 @@ def main():
 
     # for trs in get_all_transactions():
     #     print(trs)
-    redis_db.set(hash_prefix['personal_account'] + str(acc1._id), json.dumps(acc1.__dict__()))
+    redis_db.set(hash_prefix['personal_account'] + str(acc1._id), json.dumps(acc1.dict()))
 
-    redis_db.set(hash_prefix['savings_account'] + str(acc2._id), json.dumps(acc2.__dict__()))
+    redis_db.set(hash_prefix['savings_account'] + str(acc2._id), json.dumps(acc2.dict()))
 
 if __name__ == '__main__':
     main()
