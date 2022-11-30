@@ -3,6 +3,8 @@ from db.db import redis_db, hash_prefix
 from models.account import SavingsAccount, PersonalAccount
 
 class AccountManagerDecorator():
+    prefix = hash_prefix['account']
+
     @staticmethod
     def add_account(func):
         def wrapper(*args, **kwargs):
@@ -19,8 +21,7 @@ class AccountManagerDecorator():
     @staticmethod
     def get_account(func):
         def wrapper(*args, **kwargs):
-            prefix = hash_prefix['account']
-            account = redis_db.get(f'{prefix}{args[0]}')
+            account = redis_db.get(f'{AccountManagerDecorator.prefix}{args[0]}')
             if account is None:
                 return func(*args, **kwargs)
 
@@ -33,8 +34,7 @@ class AccountManagerDecorator():
     @staticmethod
     def get_all_accounts(func):
         def wrapper(*args, **kwargs):
-            prefix = hash_prefix['account']
-            keys = redis_db.keys(f'{prefix}*')
+            keys = redis_db.keys(f'{AccountManagerDecorator.prefix}*')
             if keys is None:
                 return func(*args, **kwargs)
 
@@ -48,12 +48,12 @@ class AccountManagerDecorator():
             return accounts
         return wrapper
 
-    # @staticmethod
-    # def delete_account(id):
-    #     collection = get_collection('accounts')
-    #     result = collection.find_one({'_id': str(id)})
-    #     if result is not None:
-    #         collection.delete_one({'_id': str(id)})
+    @staticmethod
+    def delete_account(func):
+        def wrapper(*args, **kwargs):
+            redis_db.delete(f'{AccountManagerDecorator.prefix}{args[0]}')
+            func(*args, **kwargs)
+        return wrapper
 
     # @staticmethod
     # def update_account(account, values):
@@ -81,7 +81,6 @@ class AccountManagerDecorator():
 
     @staticmethod
     def get_cached():
-        prefix = hash_prefix['account']
-        keys = redis_db.keys(f'{prefix}*')
+        keys = redis_db.keys(f'{AccountManagerDecorator.prefix}*')
         accounts = [json.loads(redis_db.get(key)) for key in keys]
         return accounts

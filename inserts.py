@@ -7,12 +7,7 @@ import json
 
 
 def main():
-    # for acc in get_all_accounts():
-    #     delete_account(acc._id)
-
-    # for trs in get_all_transactions():
-    #     delete_transaction(trs._id)
-
+    AccountManager.delete_account("a7314dc8-7b52-4e41-9bb0-0e4b4df6736f")
     client = Client(first_name='Jan', last_name='Kowalski')
     acc1 = AccountManager.add_personal_account('457', 0, client)
     t1 = Transaction(10, TransactionTypes.deposit, acc1)

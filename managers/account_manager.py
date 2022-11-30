@@ -48,11 +48,10 @@ class AccountManager:
         return result
 
     @staticmethod
+    @AccountManagerDecorator.delete_account
     def delete_account(id):
         collection = get_collection('accounts')
-        result = collection.find_one({'_id': str(id)})
-        if result is not None:
-            collection.delete_one({'_id': str(id)})
+        collection.delete_one({'_id': str(id)})
 
 
     @staticmethod
