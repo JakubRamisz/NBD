@@ -10,7 +10,6 @@ class AccountManager:
         collection = get_collection('accounts')
         account = collection.find_one({'account_number': account_number})
         if account is not None:
-            print('Given account number already exists.')
             return create_from_json(account)
 
         account = SavingsAccount(account_number, balance, owner, rate=rate)
@@ -23,7 +22,6 @@ class AccountManager:
         collection = get_collection('accounts')
         account = collection.find_one({'account_number': account_number})
         if account is not None:
-            print('Given account number already exists.')
             return create_from_json(account)
 
         account = PersonalAccount(account_number, balance, owner)
@@ -32,7 +30,7 @@ class AccountManager:
 
     @staticmethod
     @AccountManagerDecorator.get_account
-    def get_account(id):
+    def get_account(id, cache=None):
         collection = get_collection('accounts')
         result = collection.find_one({'_id': str(id)})
         if result is not None:
@@ -40,7 +38,7 @@ class AccountManager:
 
     @staticmethod
     @AccountManagerDecorator.get_all_accounts
-    def get_all_accounts():
+    def get_all_accounts(cache=None):
         result = []
         collection = get_collection('accounts')
         for account in collection.find({}):
@@ -74,6 +72,7 @@ class AccountManager:
     def update_all_accounts():
         for account in AccountManager.get_all_accounts():
             AccountManager.update_account_balance(account)
+        AccountManager.invalidate_cache()
 
     @staticmethod
     @AccountManagerDecorator.invalidate_cache

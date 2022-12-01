@@ -5,14 +5,14 @@ import sys
 sys.path.append('../')
 
 from models.client import Client
-from managers.transaction_management import add_transaction,deposit, transfer, get_transaction, get_all_transactions, delete_transaction
-from managers.account_management import add_personal_account
+from managers.transaction_manager import TransactionManager
+from managers.account_manager import AccountManager
 
 class TestAccountManager(unittest.TestCase):
     def test_get_account(self):
         collection = mongomock.MongoClient().db.collection
         result = '57456a2c-1d1c-438d-94d0-28933162003a'
-        self.assertEqual(get_transaction(result)._id, result)
+        self.assertEqual(TransactionManager.get_transaction(result)._id, result)
 
     # def test_add_transaction(self):
     #     collection = mongomock.MongoClient().db.collection

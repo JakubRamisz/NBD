@@ -23,9 +23,12 @@ class AccountManagerDecorator():
     @staticmethod
     def get_account(func):
         def wrapper(*args, **kwargs):
+            redis = redis_db
             try:
-                redis_db.ping()
-                account = json.loads(redis_db.get(f'{AccountManagerDecorator.prefix}{args[0]}'))
+                if args[1] is not None:
+                    redis = args[1]
+                redis.ping()
+                account = json.loads(redis.get(f'{AccountManagerDecorator.prefix}{args[0]}'))
                 if account['type'] == 'savings_account':
                     return SavingsAccount(**account)
                 return PersonalAccount(**account)
@@ -37,8 +40,11 @@ class AccountManagerDecorator():
     @staticmethod
     def get_all_accounts(func):
         def wrapper(*args, **kwargs):
+            redis = redis_db
             try:
-                redis_db.ping()
+                if args[0] is not None:
+                    redis = args[0]
+                redis.ping()
                 accounts = []
                 cached = get_cached()
                 for account in cached:
