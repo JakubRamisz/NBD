@@ -1,23 +1,31 @@
-version: '3.8'
+version: '2'
 
-services:
-  db:
-    image: mongo:5
-    restart: always
-    container_name: mongodb
-    environment:
-      - MONGO_INITDB_DATABASE=nbddb
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=adminp
-    ports:
-      - '27017:27017'
-    
+services: 
+ cas1: 
+    container_name: cas1
+    image: cassandra:latest
     volumes:
-      - ./data:/data/db
-
-  redis:
-    image: redis/redis-stack
-    container_name: redis
+      - ./data/node1:/var/lib/cassandra/data
     ports:
-      - 6379:6379
-      - 8001:8001
+      - 9042:9042
+    environment:
+      - CASSANDRA_START_RPC=true
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=datacenter1
+ cas2:
+  container_name: cas2
+  image: cassandra:latest
+  volumes:
+      - .data/node2:/var/lib/cassandra/data
+  ports:
+      - 9043:9042
+  command: bash -c 'sleep 60;  /docker-entrypoint.sh cassandra -f'
+  depends_on:
+    - cas1
+  environment:
+      - CASSANDRA_START_RPC=true
+      - CASSANDRA_CLUSTER_NAME=MyCluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=datacenter1
+      - CASSANDRA_SEEDS=cas1
