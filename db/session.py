@@ -26,4 +26,6 @@ session.execute(
 
 session.set_keyspace('nbd')
 
+session.execute("DROP TABLE accounts;")
+
 create_tables(session)

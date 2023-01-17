@@ -8,3 +8,16 @@ def create_tables(session):
     );
     """
     )
+
+    session.execute(
+    """
+    CREATE TABLE IF NOT EXISTS accounts(
+        account_id UUID PRIMARY KEY,
+        balance FLOAT,
+        owner_id UUID,
+        type TEXT,
+        rate FLOAT,
+        last_update_date TIMESTAMP
+    );
+    """
+    )

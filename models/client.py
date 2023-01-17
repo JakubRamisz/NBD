@@ -13,6 +13,7 @@ class Client:
 
     def __dict__(self):
         _dict = {
+            'id': str(self.id),
             'first_name': self.first_name,
             'last_name': self.last_name
         }

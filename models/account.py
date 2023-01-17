@@ -4,21 +4,15 @@ from dataclasses import dataclass, field
 from typing import ClassVar
 from models.client import Client
 
-@dataclass
+
 class Account:
-    account_number: str
-    balance: float
-    owner: Client
-    type: ClassVar
-    _id: uuid4 = field(default_factory=uuid4)
-
-    def __post_init__(self):
-        if isinstance(self.owner, dict):
-            self.owner = Client(**self.owner)
-
-        if isinstance(self._id, dict):
-            self._id = UUID(self._id)
-
+    def __init__(self, balance, owner, id=uuid4()):
+        self.balance = balance
+        self.owner = owner
+        if isinstance(id, str):
+            self.id = UUID(id)
+        else:
+            self.id = id
 
     def update_account(self):
         pass
@@ -28,8 +22,22 @@ class Account:
 
     def dict(self):
         result = {
-            '_id': str(self._id),
-            'account_number': self.account_number,
+            'id': str(self.id),
+            'balance': self.balance,
+            'owner': self.owner.dict()
+        }
+        return result
+
+
+class PersonalAccount(Account):
+    def __init__(self, balance, owner, id=uuid4()):
+        super().__init__(balance, owner, id=id)
+        self.type  = 'personal_account'
+
+
+    def dict(self):
+        result = {
+            'id': str(self.id),
             'balance': self.balance,
             'owner': self.owner.dict(),
             'type': self.type
@@ -37,16 +45,13 @@ class Account:
         return result
 
 
-@dataclass
-class PersonalAccount(Account):
-    type: str = 'personal_account'
-
-
-@dataclass
 class SavingsAccount(Account):
-    type: str = 'savings_account'
-    rate: float = 0.1
-    last_update_date: datetime = datetime.now()
+    def __init__(self, balance, owner, rate, id=uuid4()):
+        super().__init__(balance, owner, id=id)
+        self.type  = 'savings_account'
+        self.rate = rate
+        self.last_update_date = datetime.now()
+
 
     def update_account(self):
         self.last_update_date = datetime.now()
@@ -58,8 +63,7 @@ class SavingsAccount(Account):
 
     def dict(self):
         result = {
-            '_id': str(self._id),
-            'account_number': self.account_number,
+            'id': str(self.id),
             'balance': self.balance,
             'owner': self.owner.dict(),
             'type': self.type,

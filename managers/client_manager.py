@@ -17,5 +17,11 @@ class ClientManager:
         return clients
 
     @staticmethod
-    def delete_client(client_id):
-        session.execute(f"DELETE FROM clients WHERE client_id = {client_id};")
+    def get_client(id):
+        result = session.execute(f"SELECT * FROM clients WHERE client_id = {id};")[0]
+        client = Client(result.first_name, result.last_name, id=result.client_id)
+        return client
+
+    @staticmethod
+    def delete_client(id):
+        session.execute(f"DELETE FROM clients WHERE client_id = {id};")
