@@ -1,14 +1,19 @@
-from dataclasses import dataclass
+from uuid import uuid4, UUID
 
-
-@dataclass
 class Client:
-    first_name: str
-    last_name: str
+    tablename = 'clients'
 
-    def dict(self):
-        result = {
+    def __init__(self, first_name, last_name, id=uuid4()):
+        self.first_name = first_name
+        self.last_name = last_name
+        if isinstance(id, str):
+            self.id = UUID(id)
+        else:
+            self.id = id
+
+    def __dict__(self):
+        _dict = {
             'first_name': self.first_name,
             'last_name': self.last_name
         }
-        return result
+        return _dict
