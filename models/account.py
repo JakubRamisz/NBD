@@ -1,8 +1,5 @@
 from uuid import uuid4, UUID
 from datetime import datetime, timedelta
-from dataclasses import dataclass, field
-from typing import ClassVar
-from models.client import Client
 
 
 class Account:

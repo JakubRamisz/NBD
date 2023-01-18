@@ -1,8 +1,10 @@
 from db.session import session
-from uuid import uuid4, UUID
+from db.config import TABLENAMES
+from uuid import UUID
 from models.account import SavingsAccount, PersonalAccount
 from managers.client_manager import ClientManager
 
+_tablename = TABLENAMES["ACCOUNT"]
 
 class AccountManager:
     @staticmethod
@@ -10,9 +12,9 @@ class AccountManager:
         account = SavingsAccount(balance, owner, rate=rate)
         session.execute(
             f"""
-            INSERT INTO accounts(account_id, balance, owner_id, type, rate,
+            INSERT INTO {_tablename}(account_id, balance, owner_id, type, rate,
             last_update_date) VALUES ({account.id}, {account.balance}, {account.owner.id},
-            '{account.type}', {account.rate},'{account.last_update_date}');
+            '{account.type}', {account.rate}, '{account.last_update_date}');
             """
         )
         return account
@@ -23,7 +25,7 @@ class AccountManager:
         account = PersonalAccount(balance, owner)
         session.execute(
             f"""
-            INSERT INTO accounts(account_id, balance, owner_id, type)
+            INSERT INTO {_tablename}(account_id, balance, owner_id, type)
             VALUES ({account.id}, {account.balance},
             {account.owner.id}, '{account.type}');
             """
@@ -33,21 +35,21 @@ class AccountManager:
 
     @staticmethod
     def get_account(id):
-        result = session.execute(f"SELECT * FROM accounts WHERE account_id = {UUID(id)};")[0]
+        result = session.execute(f"SELECT * FROM {_tablename} WHERE account_id = {UUID(id)};")[0]
         account = create_from_row(result)
         return account
 
 
     @staticmethod
     def get_all_accounts():
-        results = session.execute("SELECT * FROM accounts;")
+        results = session.execute(f"SELECT * FROM {_tablename};")
         accounts = [create_from_row(result) for result in results]
         return accounts
 
 
     @staticmethod
     def delete_account(id):
-        session.execute(f"DELETE FROM accounts WHERE account_id = {id};")
+        session.execute(f"DELETE FROM {_tablename} WHERE account_id = {id};")
 
 
     @staticmethod
@@ -55,7 +57,7 @@ class AccountManager:
         if account.type == 'savings_account':
             session.execute(
                 f"""
-                UPDATE accounts SET balance = {account.balance}, owner_id = {account.owner.id},
+                UPDATE {_tablename} SET balance = {account.balance}, owner_id = {account.owner.id},
                 type = '{account.type}', rate = {account.rate},
                 last_update_date = '{account.last_update_date}' WHERE account_id = {account.id};
                 """
@@ -63,8 +65,8 @@ class AccountManager:
         else:
             session.execute(
                 f"""
-                UPDATE accounts SET balance = {account.balance}, owner_id = {account.owner.id},
-                type = {account.type} WHERE account_id = {account.id};
+                UPDATE {_tablename} SET balance = {account.balance}, owner_id = {account.owner.id},
+                type = '{account.type}' WHERE account_id = {account.id};
                 """
             )
 
@@ -72,8 +74,7 @@ class AccountManager:
     @staticmethod
     def update_account_balance(account):
         account.update_balance()
-        if account.type == 'savings_account':
-            AccountManager.update_account(account)
+        AccountManager.update_account(account)
 
     @staticmethod
     def update_all_accounts():
