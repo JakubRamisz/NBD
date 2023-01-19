@@ -14,7 +14,7 @@ class ClientManager:
 
     @staticmethod
     def get_all_clients():
-        results = session.execute("SELECT * FROM {_tablename};")
+        results = session.execute(f"SELECT * FROM {_tablename};")
         clients = [Client(result.first_name, result.last_name, id=result.client_id) for result in results]
         return clients
 
@@ -26,4 +26,17 @@ class ClientManager:
 
     @staticmethod
     def delete_client(id):
-        session.execute(f"DELETE FROM {_tablename} WHERE client_id = {id};")
+        try:
+            session.execute(f"DELETE FROM {_tablename} WHERE client_id = {id};")
+        except IndexError as exc:
+            raise IndexError from exc
+
+    @staticmethod
+    def update_client(client):
+        session.execute(
+            f"""
+            UPDATE {_tablename} SET first_name = '{client.first_name}',
+            last_name = '{client.last_name}'
+            WHERE client_id = {client.id};
+            """
+        )
