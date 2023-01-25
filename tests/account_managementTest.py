@@ -5,7 +5,7 @@ import sys
 sys.path.append('../')
 
 from models.client import Client
-from managers.account_management import update_account, delete_account_by_account_number, get_account_by_account_number,get_account,add_personal_account, add_savings_account, get_all_accounts, delete_account
+from managers.account_manager import update_account, delete_account_by_account_number, get_account_by_account_number,get_account,add_personal_account, add_savings_account, get_all_accounts, delete_account
 
 
 class TestAccountManager(unittest.TestCase):

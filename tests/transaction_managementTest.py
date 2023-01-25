@@ -5,8 +5,8 @@ import sys
 sys.path.append('../')
 
 from models.client import Client
-from managers.transaction_management import add_transaction,deposit, transfer, get_transaction, get_all_transactions, delete_transaction
-from managers.account_management import add_personal_account
+from managers.transaction_manager import add_transaction,deposit, transfer, get_transaction, get_all_transactions, delete_transaction
+from managers.account_manager import add_personal_account
 
 class TestAccountManager(unittest.TestCase):
     def test_get_account(self):
