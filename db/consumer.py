@@ -29,10 +29,14 @@ class Consumer():
 
 
     def read(self):
-        while True:
-            for message in self.consumer:
-                print(f'New transaction: {message.value["_id"]}')
-                self.collection.insert_one(message.value)
+        try:
+            while True:
+                for message in self.consumer:
+                    print(f'New transaction: {message.value["_id"]}')
+                    self.collection.insert_one(message.value)
+        except KeyboardInterrupt as exc:
+            self.consumer.close()
+            raise KeyboardInterrupt from exc
 
 
     def read_all(self):
