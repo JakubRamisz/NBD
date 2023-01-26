@@ -32,8 +32,13 @@ class Consumer():
         try:
             while True:
                 for message in self.consumer:
-                    print(f'New transaction: {message.value["_id"]}')
+                    partitions = ''
+                    for partition in list(self.consumer.assignment()):
+                        partitions += str(partition.partition) + ' '
+
+                    print(f'New transaction: {message.value["_id"]}  |  Partitions:{partitions}')
                     self.collection.insert_one(message.value)
+
         except KeyboardInterrupt as exc:
             self.consumer.close()
             raise KeyboardInterrupt from exc
